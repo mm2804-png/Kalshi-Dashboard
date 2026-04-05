@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Kalshi Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07090f;--card:#0f1520;--border:#1c2535;
+  --cyan:#00d4ff;--green:#00e676;--yellow:#ffd740;
+  --red:#ff5252;--purple:#c87fff;--orange:#ff9f43;
+  --white:#dde3f0;--muted:#4a566e;
+}
+html{font-size:16px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);
+  min-height:100vh;padding-bottom:32px}
+
+/* Header */
+.header{background:var(--card);border-bottom:1px solid var(--border);
+  padding:14px 16px;position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.logo span{color:var(--cyan)}
+.gen-time{font-size:10px;color:var(--muted)}
+.refresh-btn{background:var(--cyan);color:#000;border:none;border-radius:8px;
+  padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;
+  text-decoration:none;display:inline-block;line-height:1.4}
+
+/* Main */
+.main{padding:14px 12px;max-width:480px;margin:0 auto}
+
+/* Date filter */
+.date-select{width:100%;background:var(--card);border:1px solid var(--border);
+  color:var(--white);padding:9px 14px;border-radius:10px;cursor:pointer;
+  font-size:14px;font-family:inherit;font-weight:600;margin-bottom:14px;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a566e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:36px;outline:none}
+.date-select:focus{border-color:var(--cyan)}
+
+/* Live prediction badge */
+.pred-row{margin-top:6px}
+.pred-badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;
+  border-radius:6px;border:1px solid;white-space:nowrap}
+
+/* Sport filter pills */
+.sport-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sport-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;
+  color:var(--muted);font-family:inherit}
+.sport-pill.active{background:rgba(0,212,255,0.12);border-color:var(--cyan);color:var(--cyan)}
+.sport-pill .sp-wr{font-weight:400;opacity:.85}
+
+/* Big P&L hero */
+.hero{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:20px 18px;margin-bottom:12px;text-align:center}
+.hero-label{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1.2px;margin-bottom:8px}
+.hero-val{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.hero-sub{font-size:12px;color:var(--muted);margin-top:8px}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px 14px;position:relative;overflow:hidden}
+.stat-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.9px;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* Bankroll strip */
+.bk-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.bk-item{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px}
+.bk-label{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.9px;margin-bottom:4px}
+.bk-val{font-size:18px;font-weight:800}
+
+/* Section header */
+.section-hd{display:flex;justify-content:space-between;align-items:center;
+  margin:16px 0 8px 0}
+.section-title{font-size:15px;font-weight:700}
+.section-count{font-size:12px;color:var(--muted)}
+
+/* Bet cards */
+.bet-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:13px 14px;margin-bottom:8px}
+.bet-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.bet-matchup{font-size:14px;font-weight:700}
+.bet-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;
+  letter-spacing:.4px;white-space:nowrap;margin-left:8px;flex-shrink:0}
+.bwin {background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.bloss{background:rgba(255,82,82,.12);color:var(--red);  border:1px solid rgba(255,82,82,.3)}
+.bpend{background:rgba(255,215,64,.12);color:var(--yellow);border:1px solid rgba(255,215,64,.3)}
+.bbug {background:rgba(255,82,82,.08);color:var(--red);border:1px solid rgba(255,82,82,.2)}
+.bsig {background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.3)}
+.baccum{background:rgba(200,127,255,.12);color:var(--purple);border:1px solid rgba(200,127,255,.3)}
+.bfilt{background:rgba(74,86,110,.2);color:var(--muted);border:1px solid rgba(74,86,110,.4);font-size:10px}
+.bet-meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta-chip{font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);
+  border-radius:6px;padding:3px 8px}
+.meta-chip span{color:var(--white);font-weight:600}
+.bet-pnl{font-size:15px;font-weight:800;margin-top:8px}
+
+/* Copy card */
+.copy-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:13px 14px;margin-bottom:8px}
+.copy-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.copy-market{font-size:12px;color:var(--muted);word-break:break-all;line-height:1.4;
+  margin-bottom:6px}
+.copy-row{display:flex;justify-content:space-between;font-size:12px;margin-top:4px}
+.copy-row .lbl{color:var(--muted)}
+
+/* Colors */
+.vg{color:var(--green)} .vr{color:var(--red)} .vc{color:var(--cyan)}
+.vy{color:var(--yellow)} .vo{color:var(--orange)} .vp{color:var(--purple)}
+
+/* Empty */
+.empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px}
+
+/* Load more */
+.load-more{width:100%;background:var(--card);border:1px solid var(--border);
+  color:var(--muted);padding:12px;border-radius:12px;cursor:pointer;
+  font-size:13px;font-family:inherit;margin-top:4px;transition:border-color .2s}
+.load-more:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* League badge */
+.lbadge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;
+  border-radius:6px;margin-right:4px}
+.lnba{background:rgba(0,212,255,.1);color:var(--cyan)}
+.lnhl{background:rgba(0,230,118,.1);color:var(--green)}
+.lmlb{background:rgba(255,215,64,.1);color:var(--yellow)}
+.lcbb{background:rgba(255,159,67,.1);color:var(--orange)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">⚡ <span>Kalshi</span> Bot</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="gen-time">Apr 05, 2026  10:20 AM</div>
+    <a href="http://10.1.10.57:8765/mobile" class="refresh-btn">↻ Refresh</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Date filter -->
+  <select class="date-select" id="date-select" onchange="applyFilter(this.value)"></select>
+
+  <!-- Sport filter pills -->
+  <div id="sport-pills"></div>
+
+  <!-- P&L Hero -->
+  <div class="hero">
+    <div class="hero-label">Net P&L — Live</div>
+    <div class="hero-val" id="hero-pnl"></div>
+    <div class="hero-sub" id="hero-sub"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-accent" style="background:var(--cyan)"></div>
+      <div class="stat-label">Sniper Fires</div>
+      <div class="stat-val vc" id="stat-fires"></div>
+      <div class="stat-sub" id="stat-fires-sub"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-accent" style="background:var(--green)"></div>
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-val" id="stat-wr"></div>
+      <div class="stat-sub" id="stat-wr-sub"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-accent" style="background:var(--yellow)"></div>
+      <div class="stat-label">Avg Edge</div>
+      <div class="stat-val vy" id="stat-edge"></div>
+      <div class="stat-sub">vs Kalshi price</div>
+    </div>
+    <div class="stat">
+      <div class="stat-accent" style="background:var(--purple)"></div>
+      <div class="stat-label">Copy Signals</div>
+      <div class="stat-val vp" id="stat-copy"></div>
+      <div class="stat-sub" id="stat-copy-sub"></div>
+    </div>
+  </div>
+
+  <!-- Bankroll -->
+  <div class="bk-strip">
+    <div class="bk-item">
+      <div class="bk-label">Active Capital</div>
+      <div class="bk-val vc" id="bk-active"></div>
+    </div>
+    <div class="bk-item">
+      <div class="bk-label">Safety Reserve</div>
+      <div class="bk-val vy" id="bk-safety"></div>
+    </div>
+  </div>
+
+  <!-- Sniper bets -->
+  <div class="section-hd">
+    <span class="section-title">🎯 Sniper Fires</span>
+    <span class="section-count" id="sniper-count"></span>
+  </div>
+  <div id="sniper-list"></div>
+  <button class="load-more" id="sniper-more" onclick="loadMoreSniper()" style="display:none">
+    Show more ↓
+  </button>
+
+  <!-- Copy signals -->
+  <div class="section-hd">
+    <span class="section-title">📈 Copy Signals</span>
+    <span class="section-count" id="copy-count"></span>
+  </div>
+  <div id="copy-list"></div>
+  <button class="load-more" id="copy-more" onclick="loadMoreCopy()" style="display:none">
+    Show more ↓
+  </button>
+
+</div>
+
+<script>
+const sniperData = [{"timestamp": "2026-04-04 20:31:49", "league": "MLB", "away_team": "MIA", "home_team": "NYY", "score": "4-0", "period": "Top 4th", "seconds_remaining": "3", "true_prob": "0.9846", "poly_price": "0.83", "edge": "0.1546", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR041905MIANYY-MIA", "outcome_after_game": "HOME (NYY 9-7)", "bet_correct": "False", "profit_if_correct": "0.2", "_date": "2026-04-04"}, {"timestamp": "2026-04-04 20:31:54", "league": "MLB", "away_team": "MIA", "home_team": "NYY", "score": "4-0", "period": "Top 4th", "seconds_remaining": "3", "true_prob": "0.9846", "poly_price": "0.83", "edge": "0.1546", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR041905MIANYY-MIA", "outcome_after_game": "HOME (NYY 9-7)", "bet_correct": "False", "profit_if_correct": "0.2", "_date": "2026-04-04"}, {"timestamp": "2026-04-04 20:48:44", "league": "MLB", "away_team": "MIA", "home_team": "NYY", "score": "4-0", "period": "Bot 4th", "seconds_remaining": "3", "true_prob": "0.9846", "poly_price": "0.85", "edge": "0.1346", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR041905MIANYY-MIA", "outcome_after_game": "HOME (NYY 9-7)", "bet_correct": "False", "profit_if_correct": "0.18", "_date": "2026-04-04"}, {"timestamp": "2026-04-04 20:53:55", "league": "MLB", "away_team": "MIA", "home_team": "NYY", "score": "4-0", "period": "Top 5th", "seconds_remaining": "3", "true_prob": "0.9846", "poly_price": "0.87", "edge": "0.1146", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR041905MIANYY-MIA", "outcome_after_game": "HOME (NYY 9-7)", "bet_correct": "False", "profit_if_correct": "0.15", "_date": "2026-04-04"}, {"timestamp": "2026-04-04 20:55:45", "league": "MLB", "away_team": "CIN", "home_team": "TEX", "score": "2-0", "period": "Bot 7th", "seconds_remaining": "3", "true_prob": "0.8888", "poly_price": "0.82", "edge": "0.0688", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR041905CINTEX-CIN", "outcome_after_game": "AWAY (CIN 2-0)", "bet_correct": "True", "profit_if_correct": "0.22", "_date": "2026-04-04"}, {"timestamp": "2026-04-04 22:17:51", "league": "MLB", "away_team": "NYM", "home_team": "SF", "score": "4-0", "period": "Top 5th", "seconds_remaining": "3", "true_prob": "0.9846", "poly_price": "0.92", "edge": "0.0646", "bet_side": "AWAY", "bet_size_usd": "1.0", "poly_slug": "KXMLBGAME-26APR042105NYMSF-NYM", "outcome_after_game": "AWAY (NYM 9-0)", "bet_correct": "True", "profit_if_correct": "0.09", "_date": "2026-04-04"}];
+const copyData   = [];
+const bankroll   = {"active": 2500.0, "safety": 0.0, "total_profit": 0.0};
+const datesData  = ["2026-04-04", "2026-04-05"];
+
+let activeDateFilter  = 'all';
+let activeSportFilter = 'all';
+const PAGE = 50;
+let sniperPage = 0, copyPage = 0;
+
+function filterSniper() {
+  let d = activeDateFilter==='all' ? sniperData : sniperData.filter(r=>r._date===activeDateFilter);
+  if (activeSportFilter!=='all') d = d.filter(r=>(r.league||'').toUpperCase()===activeSportFilter);
+  return d;
+}
+function filterCopy() { return activeDateFilter==='all' ? copyData : copyData.filter(r=>r._date===activeDateFilter); }
+
+const fmt$ = v => '$' + Math.abs(parseFloat(v||0)).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtPnl = v => { const n=parseFloat(v||0); return (n>=0?'+':'-')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}); };
+const leagueBadge = l => {
+  const map = {'NBA':'lnba','NHL':'lnhl','MLB':'lmlb','CBB':'lcbb','NCAAB':'lcbb'};
+  const cls = map[(l||'').toUpperCase()] || '';
+  return `<span class="lbadge ${cls}">${l||'—'}</span>`;
+};
+
+// ── Date filter ────────────────────────────────
+function renderDateBar() {
+  const options = [['all','All dates'], ...datesData.map(d=>[d, new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})])];
+  document.getElementById('date-select').innerHTML = options.map(([d,label])=>
+    `<option value="${d}"${d===activeDateFilter?' selected':''}>${label}</option>`
+  ).join('');
+}
+
+function applyFilter(date) {
+  activeDateFilter = date;
+  sniperPage = 0; copyPage = 0;
+  renderSportPills();  // update pill stats for new date
+  renderAll();
+}
+
+function renderSportPills() {
+  // Build per-sport stats from date-filtered (not sport-filtered) data
+  const base = activeDateFilter==='all' ? sniperData : sniperData.filter(r=>r._date===activeDateFilter);
+  const sports = {};
+  base.filter(r=>r.bet_correct!=='Filtered').forEach(r=>{
+    const l=(r.league||'').toUpperCase(); if(!l) return;
+    if(!sports[l]) sports[l]={fires:0,wins:0,resolved:0};
+    sports[l].fires++;
+    if(r.bet_correct==='True')  {sports[l].wins++;sports[l].resolved++;}
+    if(r.bet_correct==='False') sports[l].resolved++;
+  });
+  const pills = [['all','All',null], ...Object.entries(sports).sort((a,b)=>b[1].fires-a[1].fires).map(([k,v])=>{
+    const wr = v.resolved ? (v.wins/v.resolved*100).toFixed(0)+'%' : '—';
+    return [k, k, v.fires, wr];
+  })];
+  document.getElementById('sport-pills').innerHTML='<div class="sport-pills">'+pills.map(p=>{
+    const [key,label,fires,wr]=p;
+    const active=activeSportFilter===key;
+    const stat=fires!=null?` <span class="sp-wr">${fires} · ${wr}</span>`:'';
+    return `<button class="sport-pill${active?' active':''}" onclick="applySportFilter('${key}')">${label}${stat}</button>`;
+  }).join('')+'</div>';
+}
+
+function applySportFilter(sport) {
+  activeSportFilter = (activeSportFilter===sport) ? 'all' : sport;
+  sniperPage = 0;
+  renderSportPills();
+  renderStats();
+  renderSniperList(true);
+}
+
+// ── Hero & Stats ───────────────────────────────
+function renderStats() {
+  const fs = filterSniper(), fc = filterCopy();
+  let sniperPnl=0, copyPnl=0;
+  fs.forEach(r=>{
+    if(r.bet_correct==='True')     sniperPnl += parseFloat(r.profit_if_correct||0);
+    if(r.bet_correct==='False')    sniperPnl -= parseFloat(r.bet_size_usd||0);
+    // 'Filtered' excluded from P&L
+  });
+  fc.forEach(r=>{ if(r._profit!=null) copyPnl += parseFloat(r._profit||0); });
+  const net = sniperPnl + copyPnl;
+
+  const heroEl = document.getElementById('hero-pnl');
+  heroEl.textContent = fmtPnl(net);
+  heroEl.className = 'hero-val ' + (net>=0?'vg':'vr');
+  document.getElementById('hero-sub').textContent =
+    `Sniper ${fmtPnl(sniperPnl)}  ·  Copy ${fmtPnl(copyPnl)}`;
+
+  const resolved = fs.filter(r=>r.bet_correct!=='');
+  const wins = resolved.filter(r=>r.bet_correct==='True').length;
+  const losses = resolved.length - wins;
+  const wr = resolved.length ? (wins/resolved.length*100) : null;
+
+  document.getElementById('stat-fires').textContent = fs.length;
+  document.getElementById('stat-fires-sub').textContent = `${wins}W / ${losses}L`;
+
+  const wrEl = document.getElementById('stat-wr');
+  wrEl.textContent = wr===null ? '—' : wr.toFixed(0)+'%';
+  wrEl.className = 'stat-val ' + (wr===null?'vc':wr>=55?'vg':wr>=45?'vy':'vr');
+  document.getElementById('stat-wr-sub').textContent = resolved.length+' resolved';
+
+  const avgEdge = fs.length ? fs.reduce((s,r)=>s+parseFloat(r.edge||0),0)/fs.length : 0;
+  document.getElementById('stat-edge').textContent = '+'+(avgEdge*100).toFixed(1)+'%';
+
+  const copyWins = fc.filter(r=>r._won===true).length;
+  const copyLoss = fc.filter(r=>r._won===false).length;
+  document.getElementById('stat-copy').textContent = fc.length;
+  document.getElementById('stat-copy-sub').textContent = `${copyWins}W / ${copyLoss}L`;
+
+  document.getElementById('bk-active').textContent = fmt$(bankroll.active);
+  document.getElementById('bk-safety').textContent = fmt$(bankroll.safety);
+}
+
+// ── Sniper cards ───────────────────────────────
+function renderSniperList(reset) {
+  const fs = [...filterSniper()].reverse();
+  const el = document.getElementById('sniper-list');
+  document.getElementById('sniper-count').textContent = fs.length + ' total';
+  if(!fs.length){el.innerHTML='<div class="empty">No sniper fires yet</div>';return;}
+
+  const slice = fs.slice(0, (sniperPage+1)*PAGE);
+  const html = slice.map(r=>{
+    const bc=r.bet_correct, isBug=(r.outcome_after_game||'').includes('BUG');
+    let badge='', pnlHtml='', pnlClass='', cardOpacity='';
+    if(bc==='Filtered'){
+      const isLowVol = r.poly_slug && (r.poly_slug.includes('-spread-') || r.poly_slug.includes('-total-'));
+      badge = isLowVol
+        ? '<span class="bet-badge bfilt">FILTERED</span> <span class="bet-badge bfilt">LOW VOLUME</span>'
+        : '<span class="bet-badge bfilt">FILTERED</span> <span class="bet-badge bfilt">GHOST PRICE</span>';
+      pnlHtml='—'; pnlClass=''; cardOpacity='opacity:.4;';
+    } else if(bc==='True'){
+      badge='<span class="bet-badge bwin">WIN</span>';
+      pnlHtml='+'+fmt$(r.profit_if_correct); pnlClass='vg';
+    } else if(bc==='False'){
+      badge=isBug
+        ?'<span class="bet-badge bloss">LOSS</span> <span class="bet-badge bbug">BUG</span>'
+        :'<span class="bet-badge bloss">LOSS</span>';
+      pnlHtml='-'+fmt$(r.bet_size_usd); pnlClass='vr';
+    } else {
+      badge='<span class="bet-badge bpend">PENDING</span>';
+      const pot=parseFloat(r.profit_if_correct||0);
+      pnlHtml=pot?'+'+fmt$(pot)+'?':'—'; pnlClass='vy';
+    }
+    const edge=(parseFloat(r.edge||0)*100).toFixed(1);
+    const ts=(r.timestamp||'').substring(5,16);
+    const sideColor=r.bet_side==='HOME'?'vc':'vg';
+    const pred = r.bet_correct==='' ? getPrediction(r) : null;
+    const predHtml = pred ? `<div class="pred-row">${predBadgeHtml(pred)}</div>` : '';
+    return `<div class="bet-card" style="${cardOpacity}">
+      <div class="bet-top">
+        <div>
+          ${leagueBadge(r.league)}
+          <span class="bet-matchup">${r.away_team||'?'} @ ${r.home_team||'?'}</span>
+        </div>
+        ${badge}
+      </div>
+      <div class="bet-meta">
+        <div class="meta-chip">Score <span>${r.score||'—'} ${r.period||''}</span></div>
+        <div class="meta-chip">Edge <span class="vc">+${edge}%</span></div>
+        <div class="meta-chip">Side <span class="${sideColor}">${r.bet_side||'—'}</span></div>
+        <div class="meta-chip">Bet <span>${fmt$(r.bet_size_usd)}</span></div>
+        <div class="meta-chip">Kalshi <span>${parseFloat(r.poly_price||0).toFixed(3)}</span></div>
+        <div class="meta-chip">Time <span>${ts}</span></div>
+      </div>
+      ${predHtml}
+      <div class="bet-pnl ${pnlClass}">${pnlHtml}</div>
+    </div>`;
+  }).join('');
+
+  if(reset) el.innerHTML = html;
+  else el.innerHTML = html;
+
+  const moreBtn = document.getElementById('sniper-more');
+  moreBtn.style.display = slice.length < fs.length ? '' : 'none';
+  moreBtn.textContent = `Show more (${fs.length - slice.length} remaining) ↓`;
+}
+
+function loadMoreSniper(){ sniperPage++; renderSniperList(); }
+
+// ── Copy cards ─────────────────────────────────
+function renderCopyList() {
+  const fc = [...filterCopy()].reverse();
+  const el = document.getElementById('copy-list');
+  document.getElementById('copy-count').textContent = fc.length + ' total';
+  if(!fc.length){el.innerHTML='<div class="empty">No copy signals yet</div>';return;}
+
+  const slice = fc.slice(0, (copyPage+1)*PAGE);
+  const html = slice.map(r=>{
+    const won=r._won;
+    let badge='', pnlHtml='', pnlClass='';
+    if(won===true){
+      badge='<span class="bet-badge bwin">WIN</span>';
+      pnlHtml='+'+fmt$(r._profit); pnlClass='vg';
+    } else if(won===false){
+      badge='<span class="bet-badge bloss">LOSS</span>';
+      pnlHtml='-'+fmt$(r.our_size); pnlClass='vr';
+    } else {
+      badge='<span class="bet-badge bpend">PENDING</span>';
+      pnlHtml='—'; pnlClass='vy';
+    }
+    const typeBadge=r.signal_type==='SIGNAL'
+      ?'<span class="bet-badge bsig">SIGNAL</span>'
+      :'<span class="bet-badge baccum">ACCUM</span>';
+    const slug=(r.slug||'');
+    const slugShort=slug.length>38?slug.substring(0,38)+'…':slug;
+    return `<div class="copy-card">
+      <div class="copy-top">
+        <div>${typeBadge}</div>
+        ${badge}
+      </div>
+      <div class="copy-market">${slugShort}</div>
+      <div class="copy-row">
+        <span class="lbl">Their bet</span>
+        <span class="vy">${fmt$(r.their_size)}</span>
+      </div>
+      <div class="copy-row">
+        <span class="lbl">Our bet</span>
+        <span class="vc">${fmt$(r.our_size)} @ ${parseFloat(r.price||0).toFixed(3)}</span>
+      </div>
+      <div class="copy-row">
+        <span class="lbl">P&L</span>
+        <span class="${pnlClass}" style="font-weight:700">${pnlHtml}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html;
+  const moreBtn = document.getElementById('copy-more');
+  moreBtn.style.display = slice.length < fc.length ? '' : 'none';
+  moreBtn.textContent = `Show more (${fc.length - slice.length} remaining) ↓`;
+}
+
+function loadMoreCopy(){ copyPage++; renderCopyList(); }
+
+// ── Boot ───────────────────────────────────────
+function renderAll(){
+  renderStats();
+  renderSniperList(true);
+  renderCopyList();
+}
+
+// ── ESPN Live Predictions ─────────────────────
+const ESPN_URLS = {
+  nba:   'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard',
+  mlb:   'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard',
+  ncaab: 'https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard',
+};
+let liveScores = {};
+let scoresLastFetch = 0;
+
+async function fetchLiveScores() {
+  if (Date.now() - scoresLastFetch < 30000) return;
+  scoresLastFetch = Date.now();
+  const fresh = {};
+  for (const [sport, url] of Object.entries(ESPN_URLS)) {
+    try {
+      const r = await fetch(url, {cache:'no-cache'});
+      if (!r.ok) continue;
+      const data = await r.json();
+      for (const ev of (data.events||[])) {
+        const comp=(ev.competitions||[])[0]; if(!comp) continue;
+        const comps=comp.competitors||[];
+        const home=comps.find(function(c){return c.homeAway==='home';});
+        const away=comps.find(function(c){return c.homeAway==='away';});
+        if(!home||!away) continue;
+        const ha=((home.team&&home.team.abbreviation)||'').toUpperCase();
+        const aa=((away.team&&away.team.abbreviation)||'').toUpperCase();
+        const st=comp.status&&comp.status.type||{};
+        fresh[sport+'_'+aa+'_'+ha]={
+          homeScore:parseInt(home.score||0),awayScore:parseInt(away.score||0),
+          completed:st.completed||false,
+          inProgress:st.state==='in',
+        };
+      }
+    } catch(e){}
+  }
+  liveScores = fresh;
+}
+
+function getPrediction(r) {
+  if (r.bet_correct!=='') return null;
+  const sport=(r.league||'').toLowerCase();
+  const away=(r.away_team||'').toUpperCase();
+  const home=(r.home_team||'').toUpperCase();
+  const game=liveScores[`${sport}_${away}_${home}`]||liveScores[`${sport}_${home}_${away}`];
+  if(!game) return null;
+  const ours=r.bet_side==='HOME'?game.homeScore:game.awayScore;
+  const opps=r.bet_side==='HOME'?game.awayScore:game.homeScore;
+  const sc=`${ours}-${opps}`;
+  if(game.completed)  return ours>opps?{t:'win',l:'✓ Final: WIN',sc}:ours<opps?{t:'loss',l:'✗ Final: LOSS',sc}:{t:'push',l:'Push',sc};
+  if(game.inProgress) return ours>opps?{t:'lead',l:'▲ Leading',sc}:ours<opps?{t:'trail',l:'▼ Trailing',sc}:{t:'tied',l:'= Tied',sc};
+  return null;
+}
+
+function predBadgeHtml(p) {
+  if(!p) return '';
+  const S={win:'rgba(0,200,80,.2);color:#00c850;border-color:rgba(0,200,80,.4)',
+           loss:'rgba(255,60,60,.2);color:#ff5252;border-color:rgba(255,60,60,.4)',
+           lead:'rgba(0,200,80,.1);color:#00e676;border-color:rgba(0,200,80,.3)',
+           trail:'rgba(255,60,60,.1);color:#ff7070;border-color:rgba(255,60,60,.3)',
+           tied:'rgba(255,193,7,.15);color:#ffc107;border-color:rgba(255,193,7,.3)',
+           push:'rgba(150,150,150,.15);color:#aaa;border-color:rgba(150,150,150,.3)'};
+  return `<span class="pred-badge" style="background:${S[p.t]||S.push}">${p.l} <span style="opacity:.65">${p.sc}</span></span>`;
+}
+
+// Fetch on load, refresh predictions every 60s
+fetchLiveScores();
+setInterval(async()=>{ await fetchLiveScores(); renderSniperList(); }, 60000);
+
+renderDateBar();
+renderSportPills();
+renderAll();
+</script>
+</body>
+</html>
