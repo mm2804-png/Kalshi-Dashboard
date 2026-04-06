@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA Spread Scanner — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060911;--surface:#0c1120;--surface2:#111828;--border:#1a2235;
+  --cyan:#00d4ff;--green:#00e676;--yellow:#ffd740;--red:#ff5252;
+  --orange:#ff9f43;--purple:#c87fff;
+  --white:#dde3f0;--muted:#4a566e;--muted2:#2a3448;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;font-size:14px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  box-shadow:0 1px 30px rgba(0,212,255,0.07);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#00d4ff,#0070ff);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo h1{font-size:18px;font-weight:800;letter-spacing:-0.3px}
+.logo p{font-size:11px;color:var(--muted);margin-top:1px}
+.header-right{display:flex;align-items:center;gap:12px}
+.updated{font-size:11px;color:var(--muted)}
+.dry-badge{display:inline-block;background:rgba(255,215,64,.12);color:var(--yellow);
+  border:1px solid rgba(255,215,64,.35);border-radius:6px;font-size:11px;
+  font-weight:700;padding:4px 12px;letter-spacing:.5px}
+.btn{background:transparent;border:1px solid var(--border);color:var(--white);
+  padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.main{padding:22px 28px;max-width:1700px;margin:0 auto}
+.tab-bar{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;
+  color:var(--muted);padding:10px 20px;cursor:pointer;font-size:13px;font-weight:600;
+  font-family:inherit;transition:all .2s;margin-bottom:-1px}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.sim-badge{display:inline-block;background:rgba(0,212,255,.12);color:var(--cyan);
+  border:1px solid rgba(0,212,255,.3);border-radius:4px;font-size:10px;
+  font-weight:700;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.date-filter{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.date-filter-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-right:4px}
+.date-btn{background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:5px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s}
+.date-btn:hover{border-color:var(--cyan);color:var(--white)}
+.date-btn.active{background:rgba(0,212,255,.12);border-color:var(--cyan);color:var(--cyan);font-weight:600}
+.cards-row{display:grid;gap:14px;margin-bottom:16px}
+.c5{grid-template-columns:repeat(5,1fr)}
+.c4{grid-template-columns:repeat(4,1fr)}
+.c2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.card:hover{box-shadow:0 0 28px rgba(0,212,255,0.09);transform:translateY(-1px)}
+.card-accent{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:10px 0 0 10px}
+.card-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:8px}
+.card-value{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.card-sub{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.4}
+.ac{background:var(--cyan)} .ag{background:var(--green)} .ay{background:var(--yellow)}
+.ar{background:var(--red)} .ao{background:var(--orange)} .ap{background:var(--purple)}
+.vc{color:var(--cyan)} .vg{color:var(--green)} .vy{color:var(--yellow)}
+.vr{color:var(--red)} .vo{color:var(--orange)} .vp{color:var(--purple)}
+.pnl-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:16px 20px;margin-bottom:18px}
+.pnl-item{text-align:center}
+.pnl-item label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.pnl-item span{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.charts-row{display:grid;grid-template-columns:5fr 3fr 4fr;gap:14px;margin-bottom:18px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.chart-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.chart-wrap{position:relative;height:230px}
+.section{margin-bottom:22px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.section-title{font-size:15px;font-weight:700}
+.section-meta{font-size:11px;color:var(--muted)}
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--surface2);padding:10px 14px;text-align:left;font-size:10px;
+  font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;
+  cursor:pointer;user-select:none;white-space:nowrap;border-bottom:1px solid var(--border);transition:color .15s}
+thead th:hover{color:var(--cyan)}
+thead th.sorted{color:var(--cyan)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+td{padding:9px 14px;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.wrap{white-space:normal;max-width:280px;font-size:11px;color:var(--muted);line-height:1.5}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.4px}
+.bwin {background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.bloss{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.3)}
+.bpend{background:rgba(255,215,64,.12);color:var(--yellow);border:1px solid rgba(255,215,64,.3)}
+.byes {background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.3)}
+.bno  {background:rgba(255,159,67,.12);color:var(--orange);border:1px solid rgba(255,159,67,.3)}
+.bdry {background:rgba(74,86,110,.2);color:var(--muted);border:1px solid rgba(74,86,110,.4);font-size:9px}
+.pagination{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px}
+.page-btn{background:var(--surface);border:1px solid var(--border);color:var(--white);
+  padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;transition:border-color .2s}
+.page-btn:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan)}
+.page-btn:disabled{opacity:.3;cursor:default}
+.page-info{font-size:11px;color:var(--muted)}
+.bt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.bt-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.bt-card h3{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.bt-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(26,34,53,.8)}
+.bt-row:last-child{border-bottom:none}
+.bt-row .lbl{color:var(--muted)}
+.bt-row .val{font-weight:700}
+hr.divider{border:none;border-top:1px solid var(--border);margin:6px 0 20px 0}
+.empty{text-align:center;padding:36px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">&#9889;</div>
+    <div>
+      <h1>NBA Spread Scanner</h1>
+      <p>Dollar-Notional Signal &bull; KXNBASPREAD &bull; 84.2% backtest WR &bull; $2,500 bankroll</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="dry-badge">DRY RUN &mdash; NO REAL MONEY</span>
+    <span class="updated" id="gen-time"></span>
+    <button class="btn" onclick="location.reload()">&#8635; Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="tab-bar">
+    <button class="tab active" id="tab-live" onclick="switchTab('live')">Live Results (Dry Run)</button>
+    <button class="tab" id="tab-bt" onclick="switchTab('bt')">Backtest Reference <span class="sim-badge">JAN&ndash;APR 2026</span></button>
+  </div>
+
+  <!-- LIVE TAB -->
+  <div id="view-live">
+    <div class="date-filter" id="date-filter-bar"></div>
+
+    <div class="cards-row c5" id="kpi-cards"></div>
+
+    <div class="pnl-strip">
+      <div class="pnl-item"><label>Realised P&amp;L</label><span id="pnl-realised">$0</span></div>
+      <div class="pnl-item"><label>Pending (at risk)</label><span id="pnl-pending" class="vy"></span></div>
+      <div class="pnl-item"><label>If All Win</label><span id="pnl-upside" class="vg"></span></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Cumulative P&amp;L &mdash; trade by trade</div>
+        <div class="chart-wrap"><canvas id="pnlChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Win / Loss / Pending</div>
+        <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Notional Ratio Distribution</div>
+        <div class="chart-wrap"><canvas id="ratioChart"></canvas></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title">Scanner Signals</span>
+        <span class="section-meta" id="trade-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th onclick="sortTrades('timestamp')">Time</th>
+            <th onclick="sortTrades('matchup')">Matchup</th>
+            <th>Market</th>
+            <th onclick="sortTrades('notional_ratio')">Ratio</th>
+            <th onclick="sortTrades('confidence')">Conf</th>
+            <th>Side</th>
+            <th onclick="sortTrades('our_contracts')">Contracts</th>
+            <th onclick="sortTrades('our_price')">Entry</th>
+            <th>Current</th>
+            <th onclick="sortTrades('our_notional')">At Risk</th>
+            <th>If Win</th>
+            <th>Status</th>
+            <th onclick="sortTrades('pnl')">P&amp;L</th>
+          </tr></thead>
+          <tbody id="trade-tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="page-btn" id="prev-btn" onclick="changePage(-1)">&larr; Prev</button>
+        <span class="page-info" id="page-info"></span>
+        <button class="page-btn" id="next-btn" onclick="changePage(1)">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKTEST TAB -->
+  <div id="view-bt" style="display:none">
+    <div class="bt-grid">
+      <div class="bt-card">
+        <h3>KXNBASPREAD at 3x Threshold (Jan&ndash;Apr 2026)</h3>
+        <div class="bt-row"><span class="lbl">Markets analyzed</span><span class="val">240</span></div>
+        <div class="bt-row"><span class="lbl">Win rate</span><span class="val vg">84.2%</span></div>
+        <div class="bt-row"><span class="lbl">Avg entry price</span><span class="val">59.5c</span></div>
+        <div class="bt-row"><span class="lbl">EV per trade</span><span class="val vg">+18.4c (+$97 on $2,500)</span></div>
+        <div class="bt-row"><span class="lbl">Series median notional</span><span class="val">$1,043</span></div>
+        <div class="bt-row"><span class="lbl">3x trigger minimum</span><span class="val">$3,129</span></div>
+        <div class="bt-row"><span class="lbl">Confidence filter</span><span class="val">10c&ndash;40c from 50c</span></div>
+        <div class="bt-row"><span class="lbl">Trades per month</span><span class="val">~60</span></div>
+      </div>
+      <div class="bt-card">
+        <h3>Kelly Sizing on $2,500</h3>
+        <div class="bt-row"><span class="lbl">Win rate</span><span class="val">84.2%</span></div>
+        <div class="bt-row"><span class="lbl">Avg odds (b)</span><span class="val">59.5c &rarr; b = 0.68</span></div>
+        <div class="bt-row"><span class="lbl">Full Kelly</span><span class="val">30.7% = $768/trade</span></div>
+        <div class="bt-row"><span class="lbl">Quarter-Kelly (live)</span><span class="val vg">7.7% = ~$193/trade</span></div>
+        <div class="bt-row"><span class="lbl">Max contracts cap</span><span class="val">1,000</span></div>
+        <div class="bt-row"><span class="lbl">Go-live target</span><span class="val vy">~Apr 20, 2026</span></div>
+        <div class="bt-row"><span class="lbl">Monthly EV (base 84%)</span><span class="val vg">~$5,340</span></div>
+        <div class="bt-row"><span class="lbl">Monthly EV (floor 75%)</span><span class="val vy">~$3,300</span></div>
+      </div>
+    </div>
+
+    <div class="bt-grid">
+      <div class="bt-card">
+        <h3>By Series at 3x Threshold</h3>
+        <div class="bt-row"><span class="lbl">KXNBASPREAD</span><span class="val vg">84.2% WR | 59.5c | DEPLOY</span></div>
+        <div class="bt-row"><span class="lbl">KXNBATOTAL</span><span class="val vg">81.2% WR | 79.6c | USE</span></div>
+        <div class="bt-row"><span class="lbl">KXNBAGAME</span><span class="val vg">92.1% WR | 92.6c | USE (near certainty)</span></div>
+        <div class="bt-row"><span class="lbl">KXNHLGAME</span><span class="val vy">84.8% WR | 85.8c | USE</span></div>
+        <div class="bt-row"><span class="lbl">KXNHLSPREAD</span><span class="val vy">77.9% WR | 64.3c | USE</span></div>
+        <div class="bt-row"><span class="lbl">KXNHLTOTAL</span><span class="val vr">65.2% WR &mdash; SKIP</span></div>
+        <div class="bt-row"><span class="lbl">NFL (all series)</span><span class="val vr">54.8% &mdash; flat 50c, no signal</span></div>
+        <div class="bt-row"><span class="lbl">UFC (enriched)</span><span class="val vr">58.1% WR &mdash; SKIP</span></div>
+      </div>
+      <div class="bt-card">
+        <h3>Confidence Band at 3x (NBA Spread)</h3>
+        <div class="bt-row"><span class="lbl">&gt;30c from 50c</span><span class="val vg">97.9% WR | avg 93c | EV only +2.4c</span></div>
+        <div class="bt-row"><span class="lbl">20&ndash;30c from 50c</span><span class="val vg">84.2% WR | sweet spot</span></div>
+        <div class="bt-row"><span class="lbl">10&ndash;20c from 50c</span><span class="val vy">68.8% WR | acceptable</span></div>
+        <div class="bt-row"><span class="lbl">&lt;10c from 50c</span><span class="val vr">60.0% WR | SKIP &mdash; coin flip zone</span></div>
+        <div class="bt-row"><span class="lbl">Jan 2026</span><span class="val vy">66.6% (honest floor, thin market)</span></div>
+        <div class="bt-row"><span class="lbl">Feb 2026</span><span class="val vg">75.1%</span></div>
+        <div class="bt-row"><span class="lbl">Mar 2026</span><span class="val vg">84.7%</span></div>
+        <div class="bt-row"><span class="lbl">Apr 2026 (5 days)</span><span class="val vg">91.9% (small sample)</span></div>
+      </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom:18px">
+      <div class="chart-title">Win Rate &amp; EV vs Notional Threshold &mdash; KXNBASPREAD Jan&ndash;Apr 2026</div>
+      <div class="chart-wrap" style="height:200px"><canvas id="backtestChart"></canvas></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const trades = [
+  {timestamp:"2026-04-06 13:26",matchup:"PHI @ SAS",title:"San Antonio wins by over 3.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:8.79,confidence:19.0,
+   side:"YES",our_contracts:422,our_price:70,cur_price:68,
+   our_notional:295.40,potential_win:126.60,result:"pending",pnl:0,_date:"2026-04-06"},
+  {timestamp:"2026-04-06 13:26",matchup:"NYK @ ATL",title:"New York wins by over 4.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:4.34,confidence:14.0,
+   side:"NO",our_contracts:527,our_price:65,cur_price:65,
+   our_notional:342.55,potential_win:184.45,result:"pending",pnl:0,_date:"2026-04-06"},
+  {timestamp:"2026-04-06 13:26",matchup:"POR @ DEN",title:"Denver wins by over 4.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.31,confidence:11.5,
+   side:"YES",our_contracts:588,our_price:62,cur_price:61,
+   our_notional:364.56,potential_win:223.44,result:"pending",pnl:0,_date:"2026-04-06"},
+  {timestamp:"2026-04-06 14:03",matchup:"MEM @ CLE",title:"Cleveland wins by over 4.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:17.23,confidence:30.5,
+   side:"YES",our_contracts:53,our_price:83,cur_price:78,
+   our_notional:43.99,potential_win:9.01,result:"pending",pnl:0,_date:"2026-04-06"}
+];
+
+const BANKROLL=2500,PAGE_SIZE=25;
+let currentPage=0,sortKey='timestamp',sortAsc=true,dateFilter='all';
+const $=id=>document.getElementById(id);
+const fmt$=(v,sign=false)=>{const s='$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});return sign?(v>=0?'+':'-')+s:s;};
+const fmtK=v=>{if(Math.abs(v)>=1000)return(v>=0?'+':'-')+'$'+Math.abs(v/1000).toFixed(1)+'K';return(v>=0?'+':'-')+'$'+Math.abs(v).toFixed(0);};
+
+function filteredTrades(){let d=[...trades];if(dateFilter!=='all')d=d.filter(t=>t._date===dateFilter);return d;}
+function sortedTrades(){const d=filteredTrades();d.sort((a,b)=>{let va=a[sortKey],vb=b[sortKey];if(typeof va==='string')return sortAsc?va.localeCompare(vb):vb.localeCompare(va);return sortAsc?va-vb:vb-va;});return d;}
+
+function switchTab(t){
+  $('view-live').style.display=t==='live'?'':'none';
+  $('view-bt').style.display=t==='bt'?'':'none';
+  $('tab-live').className='tab'+(t==='live'?' active':'');
+  $('tab-bt').className='tab'+(t==='bt'?' active':'');
+  if(t==='bt')renderBacktestChart();
+}
+
+function renderDateFilter(){
+  const dates=[...new Set(trades.map(t=>t._date))].sort();
+  const all=[['all','All dates'],...dates.map(d=>[d,new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})])];
+  $('date-filter-bar').innerHTML='<span class="date-filter-label">Date:</span>'+all.map(([v,l])=>`<button class="date-btn${v===dateFilter?' active':''}" onclick="applyDate('${v}')">${l}</button>`).join('');
+}
+function applyDate(d){dateFilter=d;currentPage=0;renderDateFilter();renderAll();}
+
+function renderKPI(){
+  const ft=filteredTrades();
+  const wins=ft.filter(t=>t.result==='win').length;
+  const losses=ft.filter(t=>t.result==='loss').length;
+  const pend=ft.filter(t=>t.result==='pending').length;
+  const resolved=wins+losses;
+  const wr=resolved?(wins/resolved*100):null;
+  let realised=0,pendNotional=0,upside=0;
+  ft.forEach(t=>{if(t.result==='win')realised+=t.potential_win;if(t.result==='loss')realised-=t.our_notional;if(t.result==='pending'){pendNotional+=t.our_notional;upside+=t.potential_win;}});
+  $('pnl-realised').textContent=fmtK(realised);$('pnl-realised').className=realised>=0?'vg':'vr';
+  $('pnl-pending').textContent=fmt$(pendNotional);
+  $('pnl-upside').textContent='+'+fmt$(upside);
+  $('kpi-cards').innerHTML=`
+    <div class="card"><div class="card-accent ac"></div><div class="card-label">Signals Fired</div><div class="card-value vc">${ft.length}</div><div class="card-sub">${pend} pending &middot; ${resolved} resolved</div></div>
+    <div class="card"><div class="card-accent ag"></div><div class="card-label">Win Rate</div><div class="card-value ${wr===null?'vc':wr>=75?'vg':wr>=55?'vy':'vr'}">${wr===null?'&mdash;':wr.toFixed(0)+'%'}</div><div class="card-sub">${wins}W / ${losses}L &middot; target 84.2%</div></div>
+    <div class="card"><div class="card-accent ay"></div><div class="card-label">Pending Notional</div><div class="card-value vy">${fmt$(pendNotional)}</div><div class="card-sub">across ${pend} open positions</div></div>
+    <div class="card"><div class="card-accent ao"></div><div class="card-label">Avg Ratio</div><div class="card-value vo">${ft.length?(ft.reduce((s,t)=>s+t.notional_ratio,0)/ft.length).toFixed(1):'&mdash;'}x</div><div class="card-sub">trigger = 3x minimum</div></div>
+    <div class="card"><div class="card-accent ap"></div><div class="card-label">If All Win</div><div class="card-value vp">+${fmt$(upside)}</div><div class="card-sub">on ${fmt$(BANKROLL,false)} bankroll</div></div>`;
+}
+
+function sortTrades(key){if(sortKey===key)sortAsc=!sortAsc;else{sortKey=key;sortAsc=true;}currentPage=0;renderTable();}
+function changePage(d){const ft=sortedTrades();const maxPage=Math.ceil(ft.length/PAGE_SIZE)-1;currentPage=Math.max(0,Math.min(maxPage,currentPage+d));renderTable();}
+
+function renderTable(){
+  const ft=sortedTrades();const start=currentPage*PAGE_SIZE;const slice=ft.slice(start,start+PAGE_SIZE);
+  const maxPage=Math.ceil(ft.length/PAGE_SIZE);
+  $('trade-count').textContent=ft.length+' signals';
+  $('page-info').textContent=ft.length?`Page ${currentPage+1} of ${maxPage}`:'';
+  $('prev-btn').disabled=currentPage===0;$('next-btn').disabled=currentPage>=maxPage-1;
+  if(!ft.length){$('trade-tbody').innerHTML='<tr><td colspan="13" class="empty">No signals for selected date</td></tr>';return;}
+  $('trade-tbody').innerHTML=slice.map(t=>{
+    const bc=t.result==='win'?'bwin':t.result==='loss'?'bloss':'bpend';
+    const bl=t.result==='win'?'WIN':t.result==='loss'?'LOSS':'PENDING';
+    const pnlVal=t.result==='win'?t.potential_win:t.result==='loss'?-t.our_notional:null;
+    const pnlStr=pnlVal===null?'<span style="color:var(--muted)">&mdash;</span>':`<span class="${pnlVal>=0?'vg':'vr'}">${fmt$(pnlVal,true)}</span>`;
+    const delta=t.cur_price-t.our_price;
+    const fav=t.side==='YES'?delta>=0:delta<=0;
+    const deltaStr=(delta>=0?'+':'')+delta.toFixed(0)+'c';
+    return `<tr>
+      <td>${t.timestamp.slice(11)}</td>
+      <td><strong>${t.matchup}</strong></td>
+      <td class="wrap">${t.title}</td>
+      <td><strong class="${t.notional_ratio>=5?'vg':t.notional_ratio>=3?'vy':'vo'}">${t.notional_ratio.toFixed(1)}x</strong></td>
+      <td>${t.confidence}c</td>
+      <td><span class="badge ${t.side==='YES'?'byes':'bno'}">${t.side}</span></td>
+      <td>${t.our_contracts.toLocaleString()}</td>
+      <td>${t.our_price}c</td>
+      <td><span class="${fav&&t.result==='pending'?'vg':!fav&&t.result==='pending'?'vr':''}">${t.cur_price}c <small style="opacity:.6">(${deltaStr})</small></span></td>
+      <td>${fmt$(t.our_notional)}</td>
+      <td class="vg">+${fmt$(t.potential_win)}</td>
+      <td><span class="badge ${bc}">${bl}</span> <span class="badge bdry">DRY</span></td>
+      <td>${pnlStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+let pnlC,donutC,ratioC,btC;
+function renderCharts(){
+  const ft=filteredTrades();
+  let run=0;
+  const pnlPts=ft.map(t=>{if(t.result==='win')run+=t.potential_win;if(t.result==='loss')run-=t.our_notional;return parseFloat(run.toFixed(2));});
+  if(pnlC)pnlC.destroy();
+  pnlC=new Chart($('pnlChart'),{type:'line',data:{labels:ft.map((_,i)=>'T'+(i+1)),datasets:[{label:'P&L ($)',data:pnlPts,borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,0.07)',tension:0.3,fill:true,pointRadius:5,pointBackgroundColor:pnlPts.map(v=>v>=0?'#00e676':'#ff5252')}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',font:{size:11}}},y:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',font:{size:11},callback:v=>'$'+v.toFixed(0)}}}}});
+  const wins=ft.filter(t=>t.result==='win').length,losses=ft.filter(t=>t.result==='loss').length,pend=ft.filter(t=>t.result==='pending').length;
+  if(donutC)donutC.destroy();
+  donutC=new Chart($('donutChart'),{type:'doughnut',data:{labels:['Win','Loss','Pending'],datasets:[{data:[wins,losses,pend],backgroundColor:['rgba(0,230,118,.7)','rgba(255,82,82,.7)','rgba(255,215,64,.5)'],borderColor:['#00e676','#ff5252','#ffd740'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#4a566e',font:{size:11},padding:12}}}}});
+  const bands={'3-5x':0,'5-10x':0,'10-20x':0,'>20x':0};
+  ft.forEach(t=>{if(t.notional_ratio<5)bands['3-5x']++;else if(t.notional_ratio<10)bands['5-10x']++;else if(t.notional_ratio<20)bands['10-20x']++;else bands['>20x']++;});
+  if(ratioC)ratioC.destroy();
+  ratioC=new Chart($('ratioChart'),{type:'bar',data:{labels:Object.keys(bands),datasets:[{label:'Signals',data:Object.values(bands),backgroundColor:['rgba(0,212,255,.5)','rgba(0,230,118,.5)','rgba(255,215,64,.5)','rgba(200,127,255,.5)'],borderColor:['#00d4ff','#00e676','#ffd740','#c87fff'],borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',font:{size:11}}},y:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',font:{size:11},stepSize:1}}}}});
+}
+
+function renderBacktestChart(){
+  if(btC)return;
+  btC=new Chart($('backtestChart'),{type:'bar',data:{labels:['2x (1,847 mkts)','3x (240 mkts)','5x (546 mkts)','10x (324 mkts)'],datasets:[{label:'Win Rate %',data:[78.7,84.2,77.7,75.3],backgroundColor:'rgba(0,212,255,.5)',borderColor:'#00d4ff',borderWidth:1,borderRadius:4,yAxisID:'y'},{label:'EV (cents)',data:[9.0,18.4,9.0,5.6],backgroundColor:'rgba(0,230,118,.4)',borderColor:'#00e676',borderWidth:1,borderRadius:4,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#4a566e',font:{size:11}}}},scales:{x:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',font:{size:11}}},y:{grid:{color:'rgba(26,34,53,.8)'},ticks:{color:'#4a566e',callback:v=>v+'%'},min:60,max:100,position:'left'},y2:{grid:{display:false},ticks:{color:'#00e676',callback:v=>'+'+v+'c'},position:'right'}}}});
+}
+
+function renderAll(){renderKPI();renderTable();renderCharts();}
+$('gen-time').textContent='Updated: '+new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+renderDateFilter();renderAll();
+</script>
+</body>
+</html>
