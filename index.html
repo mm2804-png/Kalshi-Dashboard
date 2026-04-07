@@ -217,8 +217,9 @@ const trades = [
     potential_win: 126.60,
     notional_ratio: 8.79,
     confidence:   19.0,
-    result:       "pending",
-    note:         "SAS favored by 3.5 &mdash; we need SAS to cover"
+    result:       "win",
+    pnl:          126.60,
+    note:         "SAS favored by 3.5 &mdash; SAS covered. WIN."
   },
   {
     timestamp:    "2026-04-06 13:26",
@@ -233,8 +234,9 @@ const trades = [
     potential_win: 184.45,
     notional_ratio: 4.34,
     confidence:   14.0,
-    result:       "pending",
-    note:         "Market says NYK is 4.5-pt favorite &mdash; we need ATL to keep it close"
+    result:       "win",
+    pnl:          184.45,
+    note:         "ATL kept it close (won the game). NO = win."
   },
   {
     timestamp:    "2026-04-06 13:26",
@@ -250,7 +252,8 @@ const trades = [
     notional_ratio: 3.31,
     confidence:   11.5,
     result:       "pending",
-    note:         "DEN is 4.5-pt favorite &mdash; we need DEN to cover comfortably"
+    pnl:          0,
+    note:         "DEN is 4.5-pt favorite &mdash; exact margin unclear, awaiting settlement"
   },
   {
     timestamp:    "2026-04-06 14:03",
@@ -265,8 +268,9 @@ const trades = [
     potential_win: 9.01,
     notional_ratio: 17.23,
     confidence:   30.5,
-    result:       "pending",
-    note:         "CLE is heavy favorite &mdash; Kelly size small because at 83c (near max conf band)"
+    result:       "win",
+    pnl:          9.01,
+    note:         "CLE covered. WIN."
   }
 ];
 
