@@ -205,72 +205,130 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);
 // ─────────────────────────────────────────────────────────────
 const trades = [
   {
-    timestamp:    "2026-04-06 13:26",
-    ticker:       "KXNBASPREAD-26APR06PHISAS-SAS3",
-    title:        "San Antonio wins by over 3.5 Points?",
-    matchup:      "PHI @ SAS",
-    side:         "YES",
-    contracts:    422,
-    entry_price:  70,
-    cur_price:    68,
-    notional:     295.40,
-    potential_win: 126.60,
-    notional_ratio: 8.79,
-    confidence:   19.0,
-    result:       "win",
-    pnl:          126.60,
-    note:         "SAS favored by 3.5 &mdash; SAS covered. WIN."
+    timestamp:"2026-04-06 13:26",ticker:"KXNBASPREAD-26APR06PHISAS-SAS3",
+    title:"San Antonio wins by over 3.5 Points?",matchup:"PHI @ SAS",
+    side:"YES",contracts:422,entry_price:70,cur_price:70,
+    notional:295.40,potential_win:126.60,notional_ratio:8.79,confidence:19.0,
+    result:"win",note:"SAS covered. WIN."
   },
   {
-    timestamp:    "2026-04-06 13:26",
-    ticker:       "KXNBASPREAD-26APR06NYKATL-NYK4",
-    title:        "New York wins by over 4.5 Points?",
-    matchup:      "NYK @ ATL",
-    side:         "NO",
-    contracts:    527,
-    entry_price:  65,
-    cur_price:    65,
-    notional:     342.55,
-    potential_win: 184.45,
-    notional_ratio: 4.34,
-    confidence:   14.0,
-    result:       "win",
-    pnl:          184.45,
-    note:         "ATL kept it close (won the game). NO = win."
+    timestamp:"2026-04-06 13:26",ticker:"KXNBASPREAD-26APR06NYKATL-NYK4",
+    title:"New York wins by over 4.5 Points?",matchup:"NYK @ ATL",
+    side:"NO",contracts:527,entry_price:65,cur_price:65,
+    notional:342.55,potential_win:184.45,notional_ratio:4.34,confidence:14.0,
+    result:"win",note:"ATL won the game &mdash; NYK did not cover 4.5. WIN."
   },
   {
-    timestamp:    "2026-04-06 13:26",
-    ticker:       "KXNBASPREAD-26APR06PORDEN-DEN4",
-    title:        "Denver wins by over 4.5 Points?",
-    matchup:      "POR @ DEN",
-    side:         "YES",
-    contracts:    588,
-    entry_price:  62,
-    cur_price:    61,
-    notional:     364.56,
-    potential_win: 223.44,
-    notional_ratio: 3.31,
-    confidence:   11.5,
-    result:       "pending",
-    pnl:          0,
-    note:         "DEN is 4.5-pt favorite &mdash; exact margin unclear, awaiting settlement"
+    timestamp:"2026-04-06 13:26",ticker:"KXNBASPREAD-26APR06PORDEN-DEN4",
+    title:"Denver wins by over 4.5 Points?",matchup:"POR @ DEN",
+    side:"YES",contracts:588,entry_price:62,cur_price:62,
+    notional:364.56,potential_win:223.44,notional_ratio:3.31,confidence:11.5,
+    result:"pending",note:"Exact margin unclear, awaiting settlement"
   },
   {
-    timestamp:    "2026-04-06 14:03",
-    ticker:       "KXNBASPREAD-26APR06CLEMEM-CLE4",
-    title:        "Cleveland wins by over 4.5 Points?",
-    matchup:      "MEM @ CLE",
-    side:         "YES",
-    contracts:    53,
-    entry_price:  83,
-    cur_price:    78,
-    notional:     43.99,
-    potential_win: 9.01,
-    notional_ratio: 17.23,
-    confidence:   30.5,
-    result:       "win",
-    pnl:          9.01,
-    note:         "CLE covered. WIN."
+    timestamp:"2026-04-06 14:03",ticker:"KXNBASPREAD-26APR06CLEMEM-CLE4",
+    title:"Cleveland wins by over 4.5 Points?",matchup:"MEM @ CLE",
+    side:"YES",contracts:53,entry_price:83,cur_price:83,
+    notional:43.99,potential_win:9.01,notional_ratio:17.23,confidence:30.5,
+    result:"win",note:"CLE covered. WIN."
+  },
+  {
+    timestamp:"2026-04-06 18:54",ticker:"KXNBASPREAD-26APR06CLEMEM-CLE16",
+    title:"Cleveland wins by over 16.5 Points?",matchup:"MEM @ CLE",
+    side:"NO",contracts:609,entry_price:61,cur_price:61,
+    notional:371.49,potential_win:237.51,notional_ratio:3.12,confidence:10.5,
+    result:"pending",note:"CLE won by ~13-19 pts &mdash; exact margin unclear"
+  },
+  {
+    timestamp:"2026-04-06 18:59",ticker:"KXNBASPREAD-26APR06NYKATL-ATL5",
+    title:"Atlanta wins by over 5.5 Points?",matchup:"NYK @ ATL",
+    side:"NO",contracts:527,entry_price:65,cur_price:65,
+    notional:342.55,potential_win:184.45,notional_ratio:3.15,confidence:14.5,
+    result:"pending",note:"ATL won by <8.5 &mdash; exact margin unclear"
+  },
+  {
+    timestamp:"2026-04-06 19:09",ticker:"KXNBASPREAD-26APR06DETORLE-DET6",
+    title:"Detroit wins by over 6.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:465,entry_price:68,cur_price:68,
+    notional:316.20,potential_win:148.80,notional_ratio:3.03,confidence:17.5,
+    result:"win",note:"DET lost the game &mdash; did not win by 6.5+. WIN."
+  },
+  {
+    timestamp:"2026-04-06 19:14",ticker:"KXNBASPREAD-26APR06DETORLE-DET3",
+    title:"Detroit wins by over 3.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:588,entry_price:62,cur_price:62,
+    notional:364.56,potential_win:223.44,notional_ratio:98.29,confidence:11.5,
+    result:"win",note:"98x notional signal! DET lost &mdash; did not win by 3.5+. WIN."
+  },
+  {
+    timestamp:"2026-04-06 19:14",ticker:"KXNBASPREAD-26APR06NYKATL-NYK1",
+    title:"New York wins by over 1.5 Points?",matchup:"NYK @ ATL",
+    side:"NO",contracts:588,entry_price:62,cur_price:62,
+    notional:364.56,potential_win:223.44,notional_ratio:9.80,confidence:11.0,
+    result:"win",note:"ATL won the game &mdash; NYK did not win by 1.5+. WIN."
+  },
+  {
+    timestamp:"2026-04-06 19:24",ticker:"KXNBASPREAD-26APR06DETORLE-ORL9",
+    title:"Orlando wins by over 9.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:527,entry_price:65,cur_price:65,
+    notional:342.55,potential_win:184.45,notional_ratio:3.46,confidence:13.5,
+    result:"loss",note:"ORL won by 15.5+ &mdash; 9.5 covered. LOSS."
+  },
+  {
+    timestamp:"2026-04-06 19:24",ticker:"KXNBASPREAD-26APR06NYKATL-ATL2",
+    title:"Atlanta wins by over 2.5 Points?",matchup:"NYK @ ATL",
+    side:"NO",contracts:609,entry_price:61,cur_price:61,
+    notional:371.49,potential_win:237.51,notional_ratio:61.88,confidence:10.0,
+    result:"pending",note:"61.88x notional! ATL won &mdash; unclear if 2.5+ covered"
+  },
+  {
+    timestamp:"2026-04-06 19:29",ticker:"KXNBASPREAD-26APR06DETORLE-ORL3",
+    title:"Orlando wins by over 3.5 Points?",matchup:"DET @ ORL",
+    side:"YES",contracts:609,entry_price:61,cur_price:61,
+    notional:371.49,potential_win:237.51,notional_ratio:28.55,confidence:10.5,
+    result:"win",note:"ORL won by 15.5+ &mdash; 3.5 covered. WIN."
+  },
+  {
+    timestamp:"2026-04-06 19:34",ticker:"KXNBASPREAD-26APR06DETORLE-ORL6",
+    title:"Orlando wins by over 6.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:568,entry_price:63,cur_price:63,
+    notional:357.84,potential_win:210.16,notional_ratio:14.56,confidence:12.5,
+    result:"loss",note:"ORL won by 15.5+ &mdash; 6.5 covered. LOSS."
+  },
+  {
+    timestamp:"2026-04-06 19:54",ticker:"KXNBASPREAD-26APR06CLEMEM-CLE10",
+    title:"Cleveland wins by over 10.5 Points?",matchup:"MEM @ CLE",
+    side:"YES",contracts:609,entry_price:61,cur_price:61,
+    notional:371.49,potential_win:237.51,notional_ratio:4.77,confidence:10.5,
+    result:"win",note:"CLE won by 13.5+ &mdash; 10.5 covered. WIN."
+  },
+  {
+    timestamp:"2026-04-06 20:14",ticker:"KXNBASPREAD-26APR06DETORLE-ORL15",
+    title:"Orlando wins by over 15.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:331,entry_price:74,cur_price:74,
+    notional:244.94,potential_win:86.06,notional_ratio:4.39,confidence:22.5,
+    result:"loss",note:"ORL won by 15.5+ exactly &mdash; barely covered. LOSS."
+  },
+  {
+    timestamp:"2026-04-06 20:14",ticker:"KXNBASPREAD-26APR06DETORLE-ORL12",
+    title:"Orlando wins by over 12.5 Points?",matchup:"DET @ ORL",
+    side:"NO",contracts:568,entry_price:63,cur_price:63,
+    notional:357.84,potential_win:210.16,notional_ratio:4.15,confidence:12.0,
+    result:"loss",note:"ORL won by 15.5+ &mdash; 12.5 covered. LOSS."
+  },
+  {
+    timestamp:"2026-04-06 20:14",ticker:"KXNBASPREAD-26APR06NYKATL-ATL8",
+    title:"Atlanta wins by over 8.5 Points?",matchup:"NYK @ ATL",
+    side:"NO",contracts:400,entry_price:71,cur_price:71,
+    notional:284.00,potential_win:116.00,notional_ratio:3.36,confidence:20.5,
+    result:"win",note:"ATL won by <8.5 &mdash; 8.5 did NOT cover. WIN."
+  },
+  {
+    timestamp:"2026-04-06 20:19",ticker:"KXNBASPREAD-26APR06CLEMEM-CLE13",
+    title:"Cleveland wins by over 13.5 Points?",matchup:"MEM @ CLE",
+    side:"NO",contracts:506,entry_price:66,cur_price:66,
+    notional:333.96,potential_win:172.04,notional_ratio:38.45,confidence:15.5,
+    result:"loss",note:"38x notional! CLE won by 13.5+ &mdash; covered. LOSS."
   }
 ];
 
