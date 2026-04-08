@@ -124,7 +124,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:6px 0 20px 0}
   </div>
   <div class="header-right">
     <span class="dry-badge">DRY RUN &mdash; NO REAL MONEY</span>
-    <span class="updated" id="gen-time"></span>
+    <span class="updated" id="gen-time">Updated Apr 8, 2026</span>
     <button class="btn" onclick="location.reload()">&#8635; Refresh</button>
   </div>
 </div>
@@ -349,7 +349,54 @@ const trades = [
   {timestamp:"2026-04-06 20:19",matchup:"MEM @ CLE",title:"Cleveland wins by over 13.5 Points?",
    series:"KXNBASPREAD",notional_ratio:38.45,confidence:15.5,
    side:"NO",our_contracts:506,our_price:66,cur_price:66,
-   our_notional:333.96,potential_win:172.04,result:"loss",pnl:-333.96,_date:"2026-04-06"}
+   our_notional:333.96,potential_win:172.04,result:"loss",pnl:-333.96,_date:"2026-04-06"},
+
+  // ── APR 7 2026 ── OKC blew out LAL; MIN beat IND; BOS beat CHA; GSW beat SAC
+  // OKC won by ~30pts — 11.5+ covered
+  {timestamp:"2026-04-07 00:15",matchup:"OKC @ LAL",title:"Oklahoma City wins by over 11.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:9.33,confidence:17.5,
+   side:"YES",our_contracts:378,our_price:72,cur_price:72,
+   our_notional:272.16,potential_win:105.84,result:"win",pnl:105.84,_date:"2026-04-07"},
+  // OKC 8.5+ covered
+  {timestamp:"2026-04-07 05:52",matchup:"OKC @ LAL",title:"Oklahoma City wins by over 8.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.58,confidence:28.5,
+   side:"YES",our_contracts:164,our_price:80,cur_price:80,
+   our_notional:131.20,potential_win:32.80,result:"win",pnl:32.80,_date:"2026-04-07"},
+  // BOS beat CHA — BOS won by 7.5+, our NO = loss
+  {timestamp:"2026-04-07 13:45",matchup:"CHA @ BOS",title:"Boston wins by over 7.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:4.34,confidence:10.0,
+   side:"NO",our_contracts:609,our_price:61,cur_price:61,
+   our_notional:371.49,potential_win:237.51,result:"loss",pnl:-371.49,_date:"2026-04-07"},
+  // BOS won by 1.5+
+  {timestamp:"2026-04-07 14:00",matchup:"CHA @ BOS",title:"Boston wins by over 1.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.12,confidence:12.0,
+   side:"YES",our_contracts:568,our_price:63,cur_price:63,
+   our_notional:357.84,potential_win:210.16,result:"win",pnl:210.16,_date:"2026-04-07"},
+  // MIN beat IND by 9.5+
+  {timestamp:"2026-04-07 14:51",matchup:"MIN @ IND",title:"Minnesota wins by over 9.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.70,confidence:11.5,
+   side:"YES",our_contracts:588,our_price:62,cur_price:62,
+   our_notional:364.56,potential_win:223.44,result:"win",pnl:223.44,_date:"2026-04-07"},
+  // OKC won by 14.5+
+  {timestamp:"2026-04-07 15:31",matchup:"OKC @ LAL",title:"Oklahoma City wins by over 14.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:37.91,confidence:11.5,
+   side:"YES",our_contracts:588,our_price:62,cur_price:62,
+   our_notional:364.56,potential_win:223.44,result:"win",pnl:223.44,_date:"2026-04-07"},
+  // OKC won by 23.5+ — our NO = loss
+  {timestamp:"2026-04-07 16:52",matchup:"OKC @ LAL",title:"Oklahoma City wins by over 23.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.02,confidence:16.5,
+   side:"NO",our_contracts:486,our_price:67,cur_price:67,
+   our_notional:325.62,potential_win:160.38,result:"loss",pnl:-325.62,_date:"2026-04-07"},
+  // GSW beat SAC by 4.5+
+  {timestamp:"2026-04-07 17:07",matchup:"SAC @ GSW",title:"Golden State wins by over 4.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:4.59,confidence:28.5,
+   side:"YES",our_contracts:164,our_price:80,cur_price:80,
+   our_notional:131.20,potential_win:32.80,result:"win",pnl:32.80,_date:"2026-04-07"},
+  // MIN won by 3.5+
+  {timestamp:"2026-04-07 18:07",matchup:"MIN @ IND",title:"Minnesota wins by over 3.5 Points?",
+   series:"KXNBASPREAD",notional_ratio:3.38,confidence:29.5,
+   side:"YES",our_contracts:164,our_price:80,cur_price:80,
+   our_notional:131.20,potential_win:32.80,result:"win",pnl:32.80,_date:"2026-04-07"}
 ];
 
 const BANKROLL=2500,PAGE_SIZE=25;
